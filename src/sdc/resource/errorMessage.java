@@ -1,4 +1,7 @@
 package sdc.resource;
+import java.sql.DriverManager;
+
+import sdc.database_setup;
 
 public class errorMessage{
 
@@ -14,6 +17,15 @@ public class errorMessage{
             break;
             case 1062:
                 error = "Duplicate Entry";
+            break;
+            case 1045:
+                error = "Incorrect UID or Password";
+            break;
+            case 1142:
+                error= "Access denied!";
+            break;
+            case 0:
+                error = "Connection failed. Do you want to retry?";
             break;
             default:
                 error = "Unhandled Exception";

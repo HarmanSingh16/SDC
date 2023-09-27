@@ -6,15 +6,16 @@ import java.sql.SQLException;
 
 //Importing resource functions
 import sdc.resource.*;
+import sdc.screens.loginPage;
+import sdc.client;
 
 public class intrfc extends javax.swing.JFrame implements ActionListener , ItemListener {
-    Image backgroundImage = Toolkit.getDefaultToolkit().getImage("C:/Users/singh/Desktop/sdc/src/sdc/resource/bg.jpg");
         //Element variables
         static mySql sql;
         static Frame f;
         static Panel p , p1 , p2 , p3,p4;
         static TextField t,t1;
-               Button b ;
+               Button b,b1,b2 ;
         static Font f1,f2,f3;
         static GridLayout g,g2,g3;
         static JComboBox Class,sec;
@@ -22,23 +23,11 @@ public class intrfc extends javax.swing.JFrame implements ActionListener , ItemL
 
 
     //REMOVE THIS AFTER WORK IS DONE
-
     intrfc(mySql ref){
         sql = ref;
-        this.setContentPane(new JPanel() {
-            @Override
-            public void paintComponent(Graphics g) {
-              super.paintComponent(g);
-              g.drawImage(backgroundImage, 0, 0, null);
-            }
-          });
-          pack();
-          setVisible(true);
     }
-    
     //Function to createFrame()
     void createFrame(){
-
         
         //Font settings
         f2 = new Font("Montserrat",Font.ITALIC,40);
@@ -106,6 +95,20 @@ public class intrfc extends javax.swing.JFrame implements ActionListener , ItemL
         b.addActionListener(this);
         b.setFont(f2);
 
+        //Go to login page button
+        b1 = new Button("Go to login page");
+        b1.setBackground(Color.blue);
+        b1.setForeground(Color.WHITE);
+        b1.addActionListener(this);
+        b1.setFont(f2);
+
+
+        //go to add detail
+        b2 = new Button("Go to previous screen");
+        b2.setBackground(Color.blue);
+        b2.setForeground(Color.WHITE);
+        b2.addActionListener(this);
+        b2.setFont(f2);
 
         //Layout 
         g = new GridLayout(7,0,10,10);
@@ -138,6 +141,7 @@ public class intrfc extends javax.swing.JFrame implements ActionListener , ItemL
 
         //For panel p4
         p4.add(b,b.RIGHT_ALIGNMENT);
+        p4.add(b1,b1.LEFT_ALIGNMENT);
 
 //JLabel background = new JLabel(new ImageIcon("C:/Users/singh/Desktop/sdc/src/sdc/resource/bg.jpg"));
 
@@ -153,14 +157,32 @@ public class intrfc extends javax.swing.JFrame implements ActionListener , ItemL
         f.setSize(800,600);    
         f.setVisible(true);
 
+        // f.addWindowListener(new WindowAdapter(){
+        //     @Override
+        //     public void windowClosing(WindowEvent e){
+        //         System.out.println("Hey");
+        //         sql.closeConnection();
+                
+        //    //     System.exit(0);
+        //     }
+        //     });  
 
-        f.addWindowListener(new WindowAdapter(){
+            /*Some piece of code*/
+        f.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e){
-                System.exit(0);
-            }
-            });  
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+            if (JOptionPane.showConfirmDialog(f, 
+             "Are you sure you want to close this window?", "Close Window?", 
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+            sql.closeConnection();
+            System.exit(0);
+        }
     }
+});
+    }
+
+    
     //createFrame() ends
     
     
@@ -168,40 +190,55 @@ public class intrfc extends javax.swing.JFrame implements ActionListener , ItemL
     public void actionPerformed(ActionEvent e) {
         
         //Trying to add values to database
-        try{
-            //Storing values from textfield in variables
-            String uid = t.getText();
-            String name = t1.getText();
-            int std = Integer.parseInt((String)Class.getSelectedItem());
-            String section = (String)sec.getSelectedItem();
-
-            //Creating mySql class object
-            sql.insertStudentDetails(uid,name,std,section);
-
-            //Removing frame p
-            f.remove(p);
-            f.remove(p2);
-            f.remove(p3);
-            f.remove(p4);
-
-            //Adding frame p1 (includes "Successfully Submitted")
-            f.add(p1);
-            f.setVisible(true);
+        if(e.getSource() == b1){
+            new loginPage();
         }
-        
-        catch(SQLException err){
-            //Handling Exception from database
-            String msg = errorMessage.getMessage(err.getErrorCode());
-            
-            l6.setText(msg);
-        }
-        catch(Exception err){}
-    }
+        else if(e.getSource() == b){
+            try{
+                //Storing values from textfield in variables
+                String uid = t.getText();
+                String name = t1.getText();
+                int std = Integer.parseInt((String)Class.getSelectedItem());
+                String section = (String)sec.getSelectedItem();
 
-    //Extra
+                //Creating mySql class object
+                sql.createNewStudent(uid,name,std,section,"hs@160201");
+
+                //Removing frame p
+                f.remove(p);
+                f.remove(p2);
+                f.remove(p3);
+                f.remove(p4);
+
+                //Adding frame p1 (includes "Successfully Submitted")
+                f.add(p1);
+                f.setVisible(true);
+            }
+
+            catch(SQLException err){
+                //Handling Exception from database
+                String msg = errorMessage.getMessage(err.getErrorCode());
+
+
+                if(err.getErrorCode() == 0){
+                    //Work on this code for communication link failure
+                    // this.dispose();
+                    // loginPage obj = new loginPage();
+                    // obj.connectionInterface();
+                }
+                else{
+                    JOptionPane.showMessageDialog(this, errorMessage.getMessage(err.getErrorCode()) , "Message" , JOptionPane.WARNING_MESSAGE);
+                }
+
+                System.out.println(err.getErrorCode() + err.getMessage() + "in intrfc.java");
+            }
+            catch(Exception err){}
+        }
+    }   
+
+//     //Extra
     @Override
     public void itemStateChanged(ItemEvent e) {
         throw new UnsupportedOperationException("Unimplemented method 'itemStateChanged'");
     }
-    
 }//Class ends

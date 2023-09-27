@@ -8,25 +8,136 @@ public class mySql {
 	//Connection and statement object for SQL
 	database_setup db;
 	//Establising connection in constructor
-	mySql(database_setup databaseREF) throws Exception{
+	public mySql(database_setup databaseREF) throws Exception{
 		db = databaseREF;
 	}
 	
 	//Empty main function
 	public static void main(String[] args) throws Exception{
+
 	}
 
 
 	//...............................SQL FUNCTIONS BEGIN........................................//
-	
-	//To insert student details into student table
-	void insertStudentDetails(String uid,String name,int std,String section) throws SQLException{
+
+	//TYPE CODE:
+	/*
+	 * 0 - administrator
+	 * 1 - student
+	 * 2 - teacher
+	 */
+
+
+	//Student registration
+	void createNewStudent(String uid,String name,int std,String section,String password) throws SQLException{
 		
-		uid = uid.toUpperCase();
+		uid = uid.toLowerCase();
 		name = resourceFunctions.capitalize(name);
-		db.st.execute("insert into studentDetails VALUES(\""+ uid + "\",\"" + name + "\"," + std + ",\"" + section + "\");");
-		db.st.close();
+
+			PreparedStatement insertDetails = db.con.prepareStatement("insert into studentDetails VALUES(?,?,?,?,?);");
+			//inserting data into studentDetails table
+			insertDetails.setString(1, uid);
+			insertDetails.setString(2,name);
+			insertDetails.setInt(3,std);
+			insertDetails.setString(4,section);
+			insertDetails.setInt(5,1);
+			insertDetails.execute();
+
+			//Creating the student user
+			PreparedStatement createUser = db.con.prepareStatement("CREATE USER IF NOT EXISTS ?'@''%' IDENTIFIED BY ?");
+			createUser.setString(1, uid);
+			createUser.setString(2,password);
+			createUser.execute();
+
+			//Granting permissions to student
+			PreparedStatement setPermissions = db.con.prepareStatement("GRANT SELECT ON studentDetails TO ?'@''%' ");
+			setPermissions.setString(1,uid);
+			setPermissions.execute();
+		
 	}
+
+	//Teacher registration
+	public void createNewTeacher(String uid, String name, String classes,String classTeacherOf, String subjects,String password)throws SQLException{
+		uid = uid.toLowerCase();
+
+			//Inserting data into teacherDetails table
+			PreparedStatement insertTeacherDetails = db.con.prepareStatement("insert into teacherDetails VALUES(?,?,[?],[?],[?],?)");
+			insertTeacherDetails.setString(1,uid);
+			insertTeacherDetails.setString(2,name);
+			insertTeacherDetails.setString(3,classes);
+			insertTeacherDetails.setString(4,classTeacherOf);
+			insertTeacherDetails.setString(5,subjects);
+			insertTeacherDetails.setInt(6,2);
+			insertTeacherDetails.execute();
+
+			//Creating teacher user
+			PreparedStatement createUser = db.con.prepareStatement("CREATE USER IF NOT EXISTS ?'@''%'  IDENTIFIED BY ?");
+			createUser.setString(1,uid);
+			createUser.setString(2,password);
+			createUser.execute();
+
+			//Granting permission to teacher
+			PreparedStatement setPermissions = db.con.prepareStatement("GRANT ALL ON *.* TO ?'@''%' WITH GRANT OPTION");
+			setPermissions.setString(1,uid);
+			setPermissions.execute();
+
+		}
+		// catch(Exception e){
+		// 	//Deleting the user
+		// 	System.out.println(e.getMessage());
+		// 	PreparedStatement deleteUser = db.con.prepareStatement("DELETE FROM teacherDetails WHERE uid = ?");
+		// 	deleteUser.setString(1,uid);
+		// 	deleteUser.execute();
+
+		// 	// db.st.execute("FLUSH PRIVELGES");
+		// }
+
+	//function to read student details form database
+	public ResultSet getUserDetails(String uid, int type){
+		ResultSet userDetails = null;
+
+		String typ = "";
+		if(type == 0){
+			typ = "administrator";
+		}
+		else if(type == 1){
+			typ = "student";
+		}
+		else if(type == 2){
+			typ = "teacher";
+		}
+
+		try{
+			PreparedStatement getDetails = db.con.prepareStatement("select * from ?Details where uid = ?");
+			getDetails.setString(1, typ);
+			getDetails.setString(1,uid);
+			userDetails = getDetails.executeQuery();
+			userDetails.next();
+		}
+		catch(Exception e){
+			System.out.println(e.getMessage());
+		}
+		//To access from studentDetails use studentDetails.getString("label name");
+		return userDetails;
+	}
+
+
+		//test main function
+	public static void main(String uid){
+		
+	}
+
+	//Closing database connection
+	void closeConnection(){
+		try{
+			System.out.println("Connection Closed");
+			db.con.close();
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+	}
+
 	//...............................SQL FUNCTIONS END........................................//
 }
 
