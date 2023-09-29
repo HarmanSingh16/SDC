@@ -26,7 +26,7 @@ public class loginPage extends JFrame implements ActionListener {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        // this.setContentPane(new JLabel(new ImageIcon("../logo.png")));  
+        //this.setContentPane(new JLabel(new ImageIcon("../logo.png")));  
         setLayout(new GridLayout(3,0)); 
         setSize(599,699); 
         setSize(600, 700);
@@ -35,7 +35,7 @@ public class loginPage extends JFrame implements ActionListener {
         password = new JLabel("Password:",JLabel.LEFT);
         sdc = new JLabel("",JLabel.CENTER);
 
-        sdc.setIcon(new ImageIcon("C:\\Users\\singh\\Desktop\\sdc\\src\\sdc\\logo.png"));
+        sdc.setIcon(new ImageIcon("./logo.png"));
         usernamef = new JTextField();
         passwordf = new JPasswordField();
         loginButton = new JButton("Login");
