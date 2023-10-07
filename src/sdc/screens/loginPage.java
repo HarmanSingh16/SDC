@@ -13,35 +13,44 @@ import java.sql.SQLException;
 
 public class loginPage extends JFrame implements ActionListener {
     
-     JLabel username, password , sdc , bg;
+     JLabel username, password , sdc , bg , typeL;
      JTextField usernamef;
      JPasswordField passwordf;
      JButton loginButton;
      JPanel p,p1;
+     JComboBox TypeBox;
+
 
      public String uid,pass;
+     public int type;
      public loginPage() { 
         // setContentPane(new JLabel(new ImageIcon("C:/Users/Ananya Pratap/Desktop/New folder/bglogo1.jpeg")));
         setTitle("Login Page");
-
+        setSize(600, 800);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        //this.setContentPane(new JLabel(new ImageIcon("../logo.png")));  
         setLayout(new GridLayout(3,0)); 
-        setSize(599,699); 
-        setSize(600, 700);
+     
+        String typ[] = {"Administrator","Teacher","Student"};
 
-        username = new JLabel("Username/UID:",JLabel.LEFT);
+        username = new JLabel("UID:",JLabel.LEFT);
         password = new JLabel("Password:",JLabel.LEFT);
+        typeL = new JLabel("Type:",JLabel.LEFT);
         sdc = new JLabel("",JLabel.CENTER);
 
-        sdc.setIcon(new ImageIcon("./logo.png"));
+        sdc.setIcon(new ImageIcon("./Spring Dale College/src/sdc/logo.png"));
         usernamef = new JTextField();
+        usernamef.setFont(new Font("Calibri",Font.PLAIN,16));
+        usernamef.setMargin(new Insets(0,4,0,0));
+
         passwordf = new JPasswordField();
+        passwordf.setMargin(new Insets(0,4,0,0));
         loginButton = new JButton("Login");
 
+        TypeBox = new JComboBox(typ);
+
         p = new JPanel();
-        p.setLayout(new GridLayout(6,0));
+        p.setLayout(new GridLayout(7,0));
         p.setBorder(BorderFactory.createEmptyBorder(30, 150, 0, 150));
 
         p1 = new JPanel();
@@ -54,6 +63,9 @@ public class loginPage extends JFrame implements ActionListener {
         p.add(usernamef);
         p.add(password);
         p.add(passwordf);
+        p.add(typeL);
+        p.add(TypeBox);
+        p.add(new JLabel());
 
         p1.add(loginButton);
 
@@ -68,6 +80,14 @@ public class loginPage extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == loginButton) {
+            
+            if(TypeBox.getSelectedItem() == "Administrator")
+                type = 0;
+            else if (TypeBox.getSelectedItem() == "Student")
+                type = 1;
+            else if(TypeBox.getSelectedItem() == "Teacher")
+                type = 2;
+                
             uid = usernamef.getText().toLowerCase();
             pass = new String(passwordf.getPassword());
 
@@ -82,6 +102,7 @@ public class loginPage extends JFrame implements ActionListener {
         try{
                 client.username = uid;
                 client.password = pass;
+                client.type = type;
                 
                 client.connectToDB();
                 //client.mySql.createNewTeacher("TR005028", "Harman","\"1A\"" , "\"XI\",\"A\"", "\"Physics\"", "hs@160201");

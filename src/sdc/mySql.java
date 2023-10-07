@@ -29,28 +29,32 @@ public class mySql {
 
 
 	//Student registration
-	void createNewStudent(String uid,String name,int std,String section,String password) throws SQLException{
+	public void createNewStudent(String uid,String name,int std,String section,Date dob, String f_name, String m_name, String phn_num, String password) throws SQLException{
 		
 		uid = uid.toLowerCase();
 		name = resourceFunctions.capitalize(name);
 
-			PreparedStatement insertDetails = db.con.prepareStatement("insert into studentDetails VALUES(?,?,?,?,?);");
+			PreparedStatement insertDetails = db.con.prepareStatement("insert into studentDetails VALUES(?,?,?,?,?,?,?,?,?);");
 			//inserting data into studentDetails table
 			insertDetails.setString(1, uid);
 			insertDetails.setString(2,name);
 			insertDetails.setInt(3,std);
 			insertDetails.setString(4,section);
-			insertDetails.setInt(5,1);
+			insertDetails.setDate(5, dob);
+			insertDetails.setString(6, f_name);
+			insertDetails.setString(7,m_name);
+			insertDetails.setString(8,phn_num);
+			insertDetails.setInt(9,1);
 			insertDetails.execute();
 
 			//Creating the student user
-			PreparedStatement createUser = db.con.prepareStatement("CREATE USER IF NOT EXISTS ?'@''%' IDENTIFIED BY ?");
+			PreparedStatement createUser = db.con.prepareStatement("CREATE USER IF NOT EXISTS ?@'%' IDENTIFIED BY ?");
 			createUser.setString(1, uid);
 			createUser.setString(2,password);
 			createUser.execute();
 
 			//Granting permissions to student
-			PreparedStatement setPermissions = db.con.prepareStatement("GRANT SELECT ON studentDetails TO ?'@''%' ");
+			PreparedStatement setPermissions = db.con.prepareStatement("GRANT SELECT ON studentDetails TO ?@'%' ");
 			setPermissions.setString(1,uid);
 			setPermissions.execute();
 		
@@ -71,13 +75,13 @@ public class mySql {
 			insertTeacherDetails.execute();
 
 			//Creating teacher user
-			PreparedStatement createUser = db.con.prepareStatement("CREATE USER IF NOT EXISTS ?'@''%'  IDENTIFIED BY ?");
+			PreparedStatement createUser = db.con.prepareStatement("CREATE USER IF NOT EXISTS ?@'%'  IDENTIFIED BY ?");
 			createUser.setString(1,uid);
 			createUser.setString(2,password);
 			createUser.execute();
 
 			//Granting permission to teacher
-			PreparedStatement setPermissions = db.con.prepareStatement("GRANT ALL ON *.* TO ?'@''%' WITH GRANT OPTION");
+			PreparedStatement setPermissions = db.con.prepareStatement("GRANT ALL ON *.* TO ?@'%' WITH GRANT OPTION");
 			setPermissions.setString(1,uid);
 			setPermissions.execute();
 
@@ -93,30 +97,27 @@ public class mySql {
 		// }
 
 	//function to read student details form database
-	public ResultSet getUserDetails(String uid, int type){
+	public ResultSet getUserDetails(String uid, int type) throws Exception,SQLException{
 		ResultSet userDetails = null;
+		PreparedStatement getDetails = null;
 
-		String typ = "";
-		if(type == 0){
-			typ = "administrator";
-		}
-		else if(type == 1){
-			typ = "student";
-		}
-		else if(type == 2){
-			typ = "teacher";
-		}
+			switch(type){
+				case 0:
+					getDetails = db.con.prepareStatement("select * from administratorDetails where uid = ?");
+				break;
+				case 1: 
+					getDetails = db.con.prepareStatement("select * from studentDetails where uid = ?");
+				break;
+				case 2: 
+					getDetails = db.con.prepareStatement("select * from teacherDetails where uid = ?");
+				break;
+				default:
+					throw new Exception("1542");
+			}
 
-		try{
-			PreparedStatement getDetails = db.con.prepareStatement("select * from ?Details where uid = ?");
-			getDetails.setString(1, typ);
-			getDetails.setString(1,uid);
-			userDetails = getDetails.executeQuery();
-			userDetails.next();
-		}
-		catch(Exception e){
-			System.out.println(e.getMessage());
-		}
+
+				getDetails.setString(1,uid);
+				userDetails = getDetails.executeQuery();
 		//To access from studentDetails use studentDetails.getString("label name");
 		return userDetails;
 	}
