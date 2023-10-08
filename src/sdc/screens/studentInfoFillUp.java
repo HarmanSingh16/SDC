@@ -4,10 +4,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.StringTokenizer;
+
+import java.util.StringTokenizer;
+
 import sdc.*;
 import sdc.resource.*;
 
@@ -75,7 +78,7 @@ public class studentInfoFillUp extends JFrame implements ActionListener {
         p.add(cls);
         p.add(new JLabel("Section:"));
         p.add(sec);
-        p.add(new JLabel("Date of Birth (dd-MM-yyyy):"));
+        p.add(new JLabel("Date of Birth (dd/mm/yyyy):"));
         p.add(dobf);
         p.add(new JLabel("Father's Name:"));
         p.add(fnamef);
@@ -110,14 +113,16 @@ public class studentInfoFillUp extends JFrame implements ActionListener {
 
             String ph_num = phnum.getText();
 
-            //String dobText = dobf.getText();
+            String dobText = dobf.getText();
             int Class = Integer.parseInt((String)cls.getSelectedItem());
             String section = (String)sec.getSelectedItem();
 
-            //Populate them with input form comboBox for day, month and year
-            int year = 2007;
-            int month = 02;
-            int day = 16;
+            //Populate them with input form comboBox for day, month and year    
+            StringTokenizer str = new StringTokenizer(dobText,"/");
+            int day = Integer.parseInt(str.nextToken());
+            int month = Integer.parseInt(str.nextToken());
+            int year = Integer.parseInt(str.nextToken());
+            
             
             //Resolving the date
             boolean status = true;
@@ -147,7 +152,7 @@ public class studentInfoFillUp extends JFrame implements ActionListener {
             if(status){
                 Calendar cal = Calendar.getInstance();
                 cal.set(Calendar.YEAR,year);
-                cal.set(Calendar.MONTH,month);
+                cal.set(Calendar.MONTH,month-1);
                 cal.set(Calendar.DAY_OF_MONTH,day);
 
                 java.sql.Date dob = new java.sql.Date(cal.getTimeInMillis());
@@ -162,8 +167,7 @@ public class studentInfoFillUp extends JFrame implements ActionListener {
                 catch(SQLException err){
                     //Handling Exception from database
                     String msg = errorMessage.getMessage(err.getErrorCode());
-
-
+                            
                     if(err.getErrorCode() == 0){
                         this.dispose();
                         loginPage obj = new loginPage();

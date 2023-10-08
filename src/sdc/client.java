@@ -41,7 +41,6 @@ public class client  {
         else{
             throw new SQLException("User not found","1555",1555);
         }
-
     }
 
     public static void frame(){
