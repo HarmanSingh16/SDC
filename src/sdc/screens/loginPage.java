@@ -80,7 +80,6 @@ public class loginPage extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == loginButton) {
-            
             if(TypeBox.getSelectedItem() == "Administrator")
                 type = 0;
             else if (TypeBox.getSelectedItem() == "Student")

@@ -3,6 +3,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -160,7 +163,7 @@ public class studentInfoFillUp extends JFrame implements ActionListener {
     
                 try{
 
-                    client.mySql.createNewStudent(uid,s_name,Class,section,(java.sql.Date)dob ,f_name,m_namef,ph_num,"hs@160201");
+                    client.mySql.createNewStudent(uid,s_name,Class,section,(java.sql.Date)dob ,f_name,m_namef,ph_num,"hs@160201","C:\\Users\\singh\\Desktop\\Spring Dale College\\src\\sdc\\logo.png");
                     this.dispose();
                     new studentInfoFillUp();
                 }
@@ -180,10 +183,16 @@ public class studentInfoFillUp extends JFrame implements ActionListener {
 
                 System.out.println(err.getErrorCode() + err.getMessage() + "in studentInfoFillUp.java");
                 }
+                catch(FileNotFoundException err){
+                    System.out.println(err.getMessage() + "in studentInfoFillup");
+                    JOptionPane.showMessageDialog(this, "File not found!", "Message" , JOptionPane.WARNING_MESSAGE);
+                }
+                
             }
             else{
                 JOptionPane.showMessageDialog(this, "Incorrect Date !" , "Message" , JOptionPane.WARNING_MESSAGE);
             }
+            
         }
 
 

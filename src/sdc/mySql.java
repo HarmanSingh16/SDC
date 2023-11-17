@@ -1,5 +1,8 @@
 package sdc;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.*;
 import sdc.resource.*;
 
@@ -29,12 +32,14 @@ public class mySql {
 
 
 	//Student registration
-	public void createNewStudent(String uid,String name,int std,String section,Date dob, String f_name, String m_name, String phn_num, String password) throws SQLException{
+	public void createNewStudent(String uid,String name,int std,String section,Date dob, String f_name, String m_name, String phn_num, String password,String path) throws SQLException,FileNotFoundException{
 		
 		uid = uid.toLowerCase();
 		name = resourceFunctions.capitalize(name);
 
-			PreparedStatement insertDetails = db.con.prepareStatement("insert into studentDetails VALUES(?,?,?,?,?,?,?,?,?);");
+		//Getting image
+		InputStream in = new FileInputStream(path);
+			PreparedStatement insertDetails = db.con.prepareStatement("insert into studentDetails VALUES(?,?,?,?,?,?,?,?,?,?);");
 			//inserting data into studentDetails table
 			insertDetails.setString(1, uid);
 			insertDetails.setString(2,name);
@@ -45,6 +50,7 @@ public class mySql {
 			insertDetails.setString(7,m_name);
 			insertDetails.setString(8,phn_num);
 			insertDetails.setInt(9,1);
+			insertDetails.setBlob(10,in);
 			insertDetails.execute();
 
 			//Creating the student user
